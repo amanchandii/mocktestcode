@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Question Input</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.development.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.development.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.22.10/babel.min.js"></script>
+</head>
+<body class="bg-light">
+    <div id="root" class="container mt-5"></div>
+
+    <script type="text/babel">
+        function AdminPanel() {
+            const [question, setQuestion] = React.useState("");
+            const [option1, setOption1] = React.useState("");
+            const [option2, setOption2] = React.useState("");
+            const [option3, setOption3] = React.useState("");
+            const [option4, setOption4] = React.useState("");
+            const [answer, setAnswer] = React.useState("");
+            const [questions, setQuestions] = React.useState([]);
+
+            // Function to shuffle an array randomly
+            const shuffleArray = (array) => {
+                return array.sort(() => Math.random() - 0.5);
+            };
+
+            // Function to add a question to the list
+            const addQuestion = () => {
+                if (!question || !option1 || !option2 || !option3 || !option4 || !answer) {
+                    alert("Please fill all fields");
+                    return;
+                }
+
+                let optionsArray = [option1, option2, option3, option4];
+                let shuffledOptions = shuffleArray([...optionsArray]); // Shuffle options
+
+                const newQuestion = {
+                    question: question,
+                    options: shuffledOptions,
+                    answer: answer
+                };
+
+                setQuestions([...questions, newQuestion]);
+
+                // Clear inputs
+                setQuestion("");
+                setOption1("");
+                setOption2("");
+                setOption3("");
+                setOption4("");
+                setAnswer("");
+            };
+
+            // Function to download JSON file
+            const downloadJSON = () => {
+                const jsonData = JSON.stringify(questions, null, 2);
+                const blob = new Blob([jsonData], { type: "application/json" });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = "questions.json";
+                a.click();
+                URL.revokeObjectURL(url);
+            };
+
+            return (
+                <div className="card p-4 shadow-lg">
+                    <h3 className="text-center">Admin Panel - Add Questions</h3>
+
+                    {/* Input Fields */}
+                    <div className="mb-3">
+                        <label className="form-label">Question:</label>
+                        <input type="text" className="form-control" value={question} onChange={(e) => setQuestion(e.target.value)} />
+                    </div>
+
+                    <div className="row">
+                        <div className="col-md-6">
+                            <label className="form-label">Option 1:</label>
+                            <input type="text" className="form-control" value={option1} onChange={(e) => setOption1(e.target.value)} />
+                        </div>
+                        <div className="col-md-6">
+                            <label className="form-label">Option 2:</label>
+                            <input type="text" className="form-control" value={option2} onChange={(e) => setOption2(e.target.value)} />
+                        </div>
+                    </div>
+
+                    <div className="row mt-2">
+                        <div className="col-md-6">
+                            <label className="form-label">Option 3:</label>
+                            <input type="text" className="form-control" value={option3} onChange={(e) => setOption3(e.target.value)} />
+                        </div>
+                        <div className="col-md-6">
+                            <label className="form-label">Option 4:</label>
+                            <input type="text" className="form-control" value={option4} onChange={(e) => setOption4(e.target.value)} />
+                        </div>
+                    </div>
+
+                    <div className="mb-3 mt-2">
+                        <label className="form-label">Correct Answer:</label>
+                        <input type="text" className="form-control" value={answer} onChange={(e) => setAnswer(e.target.value)} />
+                    </div>
+
+                    {/* Buttons */}
+                    <button className="btn btn-primary w-100" onClick={addQuestion}>Add Question</button>
+                    <button className="btn btn-success w-100 mt-2" onClick={downloadJSON} disabled={questions.length === 0}>Download JSON</button>
+
+                    {/* Display Questions */}
+                    <h5 className="mt-4">Questions List:</h5>
+                    <ul className="list-group">
+                        {questions.map((q, index) => (
+                            <li key={index} className="list-group-item">
+                                <strong>Q{index + 1}:</strong> {q.question}
+                                <ul>
+                                    {q.options.map((opt, idx) => (
+                                        <li key={idx}>{opt}</li>
+                                    ))}
+                                </ul>
+                                <strong>Answer:</strong> {q.answer}
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            );
+        }
+
+        ReactDOM.createRoot(document.getElementById("root")).render(<AdminPanel />);
+    </script>
+</body>
+</html>
